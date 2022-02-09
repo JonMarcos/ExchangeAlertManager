@@ -1,3 +1,22 @@
-import tkinter
+from tkinter import *
+import requests
 
-tkinter.
+response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR")
+name = response.json()["symbol"]
+value = response.json()['price']
+
+
+master = Tk()
+master.geometry("400x300")
+
+Label(master, text="Welcome to Exchange Alert Manager").pack()
+frame=Frame(master)
+frame.pack()
+
+#Text Label
+showResults = StringVar()
+showResults = "BTC = " + value + " €"
+Label(frame, text=showResults).pack()
+
+
+master.mainloop()
