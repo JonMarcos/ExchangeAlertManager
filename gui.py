@@ -18,8 +18,9 @@ def quit_window(icon, item):
    master.destroy()
 
 master = Tk()
-master.geometry("170x20-1750-1055")
-master.attributes('-topmost', 1, '-disabled', 1)
+master.geometry("170x20")
+master.overrideredirect(True)
+master.attributes("-topmost", True)
 master.resizable(width=False, height=False)
 master.title("Exchange Alert Manager")
 
