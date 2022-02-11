@@ -21,9 +21,10 @@ def show_window(icon, item):
     icon.stop()
     master.state("normal")
 
+
 def minimize_window():
     master.state("withdrawn")
-    image=Image.open("favicon.png")
+    image=Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
     icon_menu=menu(item('Quit', quit_window),item('Show',show_window))
     icon=pystray.Icon("name", image, "Exchange Alert Manager", icon_menu)
     icon.run()
@@ -32,7 +33,7 @@ def my_popup(e):
     my_menu.tk_popup(e.x_root, e.y_root)
 
 master = Tk()
-master.geometry("170x20")
+master.geometry("170x20+900+1019")
 master.overrideredirect(True)
 master.attributes("-topmost", True)
 master.resizable(width=False, height=False)
@@ -40,6 +41,7 @@ master.title("Exchange Alert Manager")
 
 my_menu = Menu(master, tearoff=False)
 my_menu.add_command(label="Minimize", command=minimize_window)
+my_menu.add_command(label="Close", command=master.destroy)
 
 master.bind("<Button-3>", my_popup)
 
