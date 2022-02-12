@@ -6,27 +6,77 @@ from time import sleep
 import constants as c
 import threading
 
+class Win(tk.Tk):
 
-def update_label():
-    try:
-        response = requests.get(c.BINANCE_API_URL + c.BTCEUR)
-        name = response.json()["symbol"]
-        value = response.json()['price']
-        if(float(value)>39000):
-            etiqueta.config(bg=c.RED)
-            master.config(bg=c.RED)
-        if(float(value)<37000):
-            etiqueta.config(bg=c.GREEN)
-            master.config(bg=c.GREEN)
-        else:
-            etiqueta.config(bg=c.BLUE)
-            master.config(bg=c.BLUE)
-    except requests.exceptions.ConnectionError:
-        name = "Connection"
-        value = "Error"
-    valor = name +' '+ value
-    etiqueta.config(text=valor)
-    master.after(1000, update_label)
+    def __init__(self,master=None):
+        tk.Tk.__init__(self,master)
+        self.geometry("170x20+900+1019")
+        self.overrideredirect(True)
+        self.attributes("-topmost", True)
+        self.resizable(width=False, height=False)
+        self.title("Exchange Alert Manager")
+        self.bind('<Button-1>',self.clickwin)
+        self.bind('<B1-Motion>',self.dragwin)
+
+    def dragwin(self,event):
+        x = self.winfo_pointerx() - self._offsetx
+        y = self.winfo_pointery() - self._offsety
+        self.geometry('+{x}+{y}'.format(x=x,y=y))
+
+    def clickwin(self,event):
+        self._offsetx = event.x
+        self._offsety = event.y
+
+    def configure_window(self):
+        slave1 = Slave(self)
+        slave1.mainloop()
+
+class Slave(tk.Toplevel):
+
+    def __init__(self,master):
+        tk.Toplevel.__init__(self,master)
+        self.overrideredirect(True)
+        self._offsetx = 0
+        self._offsety = 0
+        self.bind('<Button-1>',self.clickwin)
+        self.bind('<B1-Motion>',self.dragwin)
+
+    def dragwin(self,event):
+        x = self.winfo_pointerx() - self._offsetx
+        y = self.winfo_pointery() - self._offsety
+        self.geometry('+{x}+{y}'.format(x=x,y=y))
+
+    def clickwin(self,event):
+        self._offsetx = event.x
+        self._offsety = event.y
+
+class Label(tk.Label):
+
+    def __init__(self, master=None, text=''):
+        tk.Label.__init__(self, master, text=text)
+        self.pack()
+
+    def update_label(self, master):
+        try:
+            response = requests.get(c.BINANCE_API_URL + c.BTCEUR)
+            name = response.json()["symbol"]
+            value = response.json()['price']
+            if(float(value)>c.HIGH_PRICE):
+                self.config(bg=c.RED)
+                master.config(bg=c.RED)
+            if(float(value)<c.LOW_PRICE):
+                self.config(bg=c.GREEN)
+                master.config(bg=c.GREEN)
+            else:
+                self.config(bg=c.BLUE)
+                master.config(bg=c.BLUE)
+        except requests.exceptions.ConnectionError:
+            name = "Connection"
+            value = "Error"
+        valor = name +' '+ value
+        self.config(text=valor)
+        master.after(1000, self.update_label,master)
+
 
 # Define a function for quit the window
 def quit_window(icon, item):
@@ -48,28 +98,18 @@ def minimize_window():
 def my_popup(e):
     my_menu.tk_popup(e.x_root, e.y_root)
 
-def configure_window():
-    slave1 = tk.Toplevel(master)
-    slave1.mainloop
+master_win = Win()
 
-master = tk.Tk()
-master.geometry("170x20+900+1019")
-master.overrideredirect(True)
-master.attributes("-topmost", True)
-master.resizable(width=False, height=False)
-master.title("Exchange Alert Manager")
-
-my_menu = tk.Menu(master, tearoff=False)
-my_menu.add_command(label="Configure", command=configure_window)
+my_menu = tk.Menu(master_win, tearoff=False)
+my_menu.add_command(label="Configure", command=master_win.configure_window)
 my_menu.add_separator()
 my_menu.add_command(label="Minimize", command=minimize_window)
-my_menu.add_command(label="Close", command=master.destroy)
+my_menu.add_command(label="Close", command=master_win.destroy)
 
-master.bind("<Button-3>", my_popup)
+master_win.bind("<Button-3>", my_popup)
 
-etiqueta = tk.Label(master, text='')
-etiqueta.pack()
+etiqueta = Label(master_win, text='')
 
-update_label()
+etiqueta.update_label(master_win)
 
-master.mainloop()
+master_win.mainloop()
