@@ -48,6 +48,10 @@ def minimize_window():
 def my_popup(e):
     my_menu.tk_popup(e.x_root, e.y_root)
 
+def configure_window():
+    slave1 = tk.Toplevel(master)
+    slave1.mainloop
+
 master = tk.Tk()
 master.geometry("170x20+900+1019")
 master.overrideredirect(True)
@@ -56,6 +60,8 @@ master.resizable(width=False, height=False)
 master.title("Exchange Alert Manager")
 
 my_menu = tk.Menu(master, tearoff=False)
+my_menu.add_command(label="Configure", command=configure_window)
+my_menu.add_separator()
 my_menu.add_command(label="Minimize", command=minimize_window)
 my_menu.add_command(label="Close", command=master.destroy)
 
