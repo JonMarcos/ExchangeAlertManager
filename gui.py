@@ -11,14 +11,14 @@ def update_label():
         name = response.json()["symbol"]
         value = response.json()['price']
         if(float(value)>39000):
-            etiqueta.config(bg="#00FF00")
-            master.config(bg="#00FF00")
+            etiqueta.config(bg="#FF758A")
+            master.config(bg="#FF758A")
         if(float(value)<37000):
-            etiqueta.config(bg="#FF0000")
-            master.config(bg="#FF0000")
+            etiqueta.config(bg="#85FF7A")
+            master.config(bg="#85FF7A")
         else:
-            etiqueta.config(bg="#0000FF")
-            master.config(bg="#0000FF")
+            etiqueta.config(bg="#4FC4EB")
+            master.config(bg="#4FC4EB")
     except requests.exceptions.ConnectionError:
         name = "Connection"
         value = "Error"
