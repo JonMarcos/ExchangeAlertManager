@@ -1,24 +1,25 @@
-from tkinter import *
+import tkinter as tk
 import requests
-from pystray import MenuItem as item, Menu as menu
 import pystray
-from PIL import Image, ImageTk
+import PIL
 from time import sleep
+import constants as c
+
 
 def update_label():
     try:
-        response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR")
+        response = requests.get(c.BINANCE_API_URL + c.BTCEUR)
         name = response.json()["symbol"]
         value = response.json()['price']
         if(float(value)>39000):
-            etiqueta.config(bg="#FF758A")
-            master.config(bg="#FF758A")
+            etiqueta.config(bg=c.RED)
+            master.config(bg=c.RED)
         if(float(value)<37000):
-            etiqueta.config(bg="#85FF7A")
-            master.config(bg="#85FF7A")
+            etiqueta.config(bg=c.GREEN)
+            master.config(bg=c.GREEN)
         else:
-            etiqueta.config(bg="#4FC4EB")
-            master.config(bg="#4FC4EB")
+            etiqueta.config(bg=c.BLUE)
+            master.config(bg=c.BLUE)
     except requests.exceptions.ConnectionError:
         name = "Connection"
         value = "Error"
@@ -38,28 +39,28 @@ def show_window(icon, item):
 
 def minimize_window():
     master.state("withdrawn")
-    image=Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
-    icon_menu=menu(item('Quit', quit_window),item('Show',show_window))
+    image=PIL.Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
+    icon_menu=pystray.Menu(pystray.MenuItem('Quit', quit_window),pystray.MenuItem('Show',show_window))
     icon=pystray.Icon("name", image, "Exchange Alert Manager", icon_menu)
     icon.run()
 
 def my_popup(e):
     my_menu.tk_popup(e.x_root, e.y_root)
 
-master = Tk()
+master = tk.Tk()
 master.geometry("170x20+900+1019")
 master.overrideredirect(True)
 master.attributes("-topmost", True)
 master.resizable(width=False, height=False)
 master.title("Exchange Alert Manager")
 
-my_menu = Menu(master, tearoff=False)
+my_menu = tk.Menu(master, tearoff=False)
 my_menu.add_command(label="Minimize", command=minimize_window)
 my_menu.add_command(label="Close", command=master.destroy)
 
 master.bind("<Button-3>", my_popup)
 
-etiqueta = Label(master, text='')
+etiqueta = tk.Label(master, text='')
 etiqueta.pack()
 
 update_label()
