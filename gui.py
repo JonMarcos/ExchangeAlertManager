@@ -16,6 +16,9 @@ def update_label():
         if(float(value)<37000):
             etiqueta.config(bg="#FF0000")
             master.config(bg="#FF0000")
+        else:
+            etiqueta.config(bg="#0000FF")
+            master.config(bg="#0000FF")
     except requests.exceptions.ConnectionError:
         name = "Connection"
         value = "Error"
