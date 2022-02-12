@@ -1,9 +1,10 @@
 import tkinter as tk
 import requests
 import pystray
-import PIL
+from PIL import Image
 from time import sleep
 import constants as c
+import threading
 
 
 def update_label():
@@ -39,7 +40,7 @@ def show_window(icon, item):
 
 def minimize_window():
     master.state("withdrawn")
-    image=PIL.Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
+    image=Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
     icon_menu=pystray.Menu(pystray.MenuItem('Quit', quit_window),pystray.MenuItem('Show',show_window))
     icon=pystray.Icon("name", image, "Exchange Alert Manager", icon_menu)
     icon.run()
