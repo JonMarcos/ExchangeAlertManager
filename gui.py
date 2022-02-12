@@ -3,13 +3,24 @@ import requests
 from pystray import MenuItem as item, Menu as menu
 import pystray
 from PIL import Image, ImageTk
+from time import sleep
 
 def update_label():
-    response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR")
-    name = response.json()["symbol"]
-    value = response.json()['price']
+    try:
+        response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCEUR")
+        name = response.json()["symbol"]
+        value = response.json()['price']
+    except requests.exceptions.ConnectionError:
+        name = "Connection"
+        value = "Error"
     valor = name +' '+ value
     etiqueta.config(text=valor)
+    if(float(value)>39000):
+        etiqueta.config(bg="#00FF00")
+        master.config(bg="#00FF00")
+    if(float(value)<37000):
+        etiqueta.config(bg="#FF0000")
+        master.config(bg="#FF0000")
     master.after(1000, update_label)
 
 # Define a function for quit the window
