@@ -17,6 +17,10 @@ class Win(tk.Tk):
         self.title("Exchange Alert Manager")
         self.bind('<Button-1>',self.clickwin)
         self.bind('<B1-Motion>',self.dragwin)
+        my_menu = MyMenu(self, False)
+        self.bind('<Button-3>',my_menu.popup)
+        etiqueta = Label(self, text='')
+
 
     def dragwin(self,event):
         x = self.winfo_pointerx() - self._offsetx
@@ -31,8 +35,26 @@ class Win(tk.Tk):
         slave1 = Slave(self)
         slave1.mainloop()
 
-class Slave(tk.Toplevel):
+    def minimize_window(self):
+        self.state("withdrawn")
+        image=Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
+        icon_menu=pystray.Menu(pystray.MenuItem('Quit', self.quit_window),pystray.MenuItem('Show', self.show_window))
+        icon=pystray.Icon("name", image, "Exchange Alert Manager", icon_menu)
+        icon.run()
 
+    # Define a function for quit the window
+    def quit_window(self, icon):
+       icon.stop()
+       self.destroy()
+
+    def show_window(self, icon):
+        icon.stop()
+        self.state("normal")
+
+class Slave(tk.Toplevel):
+    """
+    Fix only possible to open one configuration window
+    """
     def __init__(self,master):
         tk.Toplevel.__init__(self,master)
         self.overrideredirect(True)
@@ -55,6 +77,7 @@ class Label(tk.Label):
     def __init__(self, master=None, text=''):
         tk.Label.__init__(self, master, text=text)
         self.pack()
+        self.update_label(master)
 
     def update_label(self, master):
         try:
@@ -77,39 +100,19 @@ class Label(tk.Label):
         self.config(text=valor)
         master.after(1000, self.update_label,master)
 
+class MyMenu(tk.Menu):
 
-# Define a function for quit the window
-def quit_window(icon, item):
-   icon.stop()
-   master.destroy()
+    def __init__(self, master=None, tearoff=False):
+        tk.Menu.__init__(self, master, tearoff=tearoff)
+        self.add_command(label="Configure", command=master.configure_window)
+        self.add_separator()
+        self.add_command(label="Minimize", command=master.minimize_window)
+        self.add_command(label="Close", command=master.destroy)
 
-def show_window(icon, item):
-    icon.stop()
-    master.state("normal")
+    def popup(self, e):
+        self.tk_popup(e.x_root, e.y_root)
 
-
-def minimize_window():
-    master.state("withdrawn")
-    image=Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
-    icon_menu=pystray.Menu(pystray.MenuItem('Quit', quit_window),pystray.MenuItem('Show',show_window))
-    icon=pystray.Icon("name", image, "Exchange Alert Manager", icon_menu)
-    icon.run()
-
-def my_popup(e):
-    my_menu.tk_popup(e.x_root, e.y_root)
 
 master_win = Win()
-
-my_menu = tk.Menu(master_win, tearoff=False)
-my_menu.add_command(label="Configure", command=master_win.configure_window)
-my_menu.add_separator()
-my_menu.add_command(label="Minimize", command=minimize_window)
-my_menu.add_command(label="Close", command=master_win.destroy)
-
-master_win.bind("<Button-3>", my_popup)
-
-etiqueta = Label(master_win, text='')
-
-etiqueta.update_label(master_win)
 
 master_win.mainloop()
