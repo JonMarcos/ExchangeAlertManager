@@ -19,7 +19,7 @@ class Win(tk.Tk):
         self.bind('<B1-Motion>',self.dragwin)
         my_menu = MyMenu(self, False)
         self.bind('<Button-3>',my_menu.popup)
-        etiqueta = Label(self, text='', apiURL=c.BINANCE_API_URL, coin=c.BTCEUR)
+        etiqueta = Label(self, text='', api_url=c.BINANCE_API_URL, coin=c.BTCEUR)
 
     def dragwin(self,event):
         x = self.winfo_pointerx() - self._offsetx
@@ -75,27 +75,27 @@ class Slave(tk.Toplevel):
 
 class Label(tk.Label):
 
-    price = ''
-    symbol = ''
-
-    def __init__(self, master=None, text='', apiURL='', coin=''):
+    def __init__(self, master=None, text='', api_url='', coin=''):
         tk.Label.__init__(self, master, text=text)
         self.pack()
-        self.update_label(master, apiURL + coin)
+        self.price = ''
+        self.symbol = ''
+        self.update_label(master, api_url + coin)
 
-    def get_request(self, apiurl):
+    def get_request(self, api_url):
         try:
-            received = requests.get(apiurl)
+            received = requests.get(api_url)
             self.symbol = received.json()["symbol"]
             self.price = received.json()['price']
         except requests.exceptions.ConnectionError:
             self.price = "Error"
+            self.symbol = "Connection"
 
-    def update_label(self, master, apiurl):
+    def update_label(self, master, api_url):
         """
         Look up if this method needs his own class
         """
-        t = threading.Thread(target=self.get_request, args=(apiurl,))
+        t = threading.Thread(target=self.get_request, args=(api_url,))
         t.start()
         try:
             if(float(self.price)>c.HIGH_PRICE):
@@ -110,10 +110,12 @@ class Label(tk.Label):
         except ValueError:
             self.config(bg=c.YELLOW)
             master.config(bg=c.YELLOW)
-            self.symbol = "Connecting..."
+            if self.symbol != "Connection":
+                self.symbol = "Connecting..."
+
         valor = self.symbol +' '+ self.price
         self.config(text=valor)
-        master.after(1000, self.update_label, master, apiurl)
+        master.after(1000, self.update_label, master, api_url)
 
 
 class MyMenu(tk.Menu):
