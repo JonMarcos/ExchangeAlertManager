@@ -1,3 +1,6 @@
+#App
+TITLE = "Exchange Alert Manager"
+
 #Price
 HIGH_PRICE = 39000
 LOW_PRICE = 37000
@@ -10,3 +13,7 @@ BTCEUR = "BTCEUR"
 RED = "#FF758A"
 GREEN = "#85FF7A"
 BLUE = "#4FC4EB"
+YELLOW = "#FAC60E"
+
+#Images
+FAVICON = "C:/Users/Jon/github/ExchangeAlertManager/favicon.png"

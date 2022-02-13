@@ -14,13 +14,12 @@ class Win(tk.Tk):
         self.overrideredirect(True)
         self.attributes("-topmost", True)
         self.resizable(width=False, height=False)
-        self.title("Exchange Alert Manager")
+        self.title(c.TITLE)
         self.bind('<Button-1>',self.clickwin)
         self.bind('<B1-Motion>',self.dragwin)
         my_menu = MyMenu(self, False)
         self.bind('<Button-3>',my_menu.popup)
-        etiqueta = Label(self, text='')
-
+        etiqueta = Label(self, text='', apiURL=c.BINANCE_API_URL, coin=c.BTCEUR)
 
     def dragwin(self,event):
         x = self.winfo_pointerx() - self._offsetx
@@ -37,9 +36,9 @@ class Win(tk.Tk):
 
     def minimize_window(self):
         self.state("withdrawn")
-        image=Image.open("C:/Users/Jon/github/ExchangeAlertManager/favicon.png")
+        image=Image.open(c.FAVICON)
         icon_menu=pystray.Menu(pystray.MenuItem('Quit', self.quit_window),pystray.MenuItem('Show', self.show_window))
-        icon=pystray.Icon("name", image, "Exchange Alert Manager", icon_menu)
+        icon=pystray.Icon("name", image, c.TITLE, icon_menu)
         icon.run()
 
     # Define a function for quit the window
@@ -50,6 +49,7 @@ class Win(tk.Tk):
     def show_window(self, icon):
         icon.stop()
         self.state("normal")
+
 
 class Slave(tk.Toplevel):
     """
@@ -72,33 +72,49 @@ class Slave(tk.Toplevel):
         self._offsetx = event.x
         self._offsety = event.y
 
+
 class Label(tk.Label):
 
-    def __init__(self, master=None, text=''):
+    price = ''
+    symbol = ''
+
+    def __init__(self, master=None, text='', apiURL='', coin=''):
         tk.Label.__init__(self, master, text=text)
         self.pack()
-        self.update_label(master)
+        self.update_label(master, apiURL + coin)
 
-    def update_label(self, master):
+    def get_request(self, apiurl):
         try:
-            response = requests.get(c.BINANCE_API_URL + c.BTCEUR)
-            name = response.json()["symbol"]
-            value = response.json()['price']
-            if(float(value)>c.HIGH_PRICE):
+            received = requests.get(apiurl)
+            self.symbol = received.json()["symbol"]
+            self.price = received.json()['price']
+        except requests.exceptions.ConnectionError:
+            self.price = "Error"
+
+    def update_label(self, master, apiurl):
+        """
+        Look up if this method needs his own class
+        """
+        t = threading.Thread(target=self.get_request, args=(apiurl,))
+        t.start()
+        try:
+            if(float(self.price)>c.HIGH_PRICE):
                 self.config(bg=c.RED)
                 master.config(bg=c.RED)
-            if(float(value)<c.LOW_PRICE):
+            if(float(self.price)<c.LOW_PRICE):
                 self.config(bg=c.GREEN)
                 master.config(bg=c.GREEN)
             else:
                 self.config(bg=c.BLUE)
                 master.config(bg=c.BLUE)
-        except requests.exceptions.ConnectionError:
-            name = "Connection"
-            value = "Error"
-        valor = name +' '+ value
+        except ValueError:
+            self.config(bg=c.YELLOW)
+            master.config(bg=c.YELLOW)
+            self.symbol = "Connecting..."
+        valor = self.symbol +' '+ self.price
         self.config(text=valor)
-        master.after(1000, self.update_label,master)
+        master.after(1000, self.update_label, master, apiurl)
+
 
 class MyMenu(tk.Menu):
 
@@ -113,6 +129,6 @@ class MyMenu(tk.Menu):
         self.tk_popup(e.x_root, e.y_root)
 
 
-master_win = Win()
-
-master_win.mainloop()
+if __name__ == '__main__':
+    master_win = Win()
+    master_win.mainloop()
