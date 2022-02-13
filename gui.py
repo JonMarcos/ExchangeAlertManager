@@ -6,8 +6,11 @@ from time import sleep
 import constants as c
 import threading
 
-class Win(tk.Tk):
 
+class MasterWindow(tk.Tk):
+    """
+    Master Window that can be dragged by left-clicking.
+    """
     def __init__(self,master=None):
         tk.Tk.__init__(self,master)
         self.geometry("170x20+900+1019")
@@ -19,25 +22,27 @@ class Win(tk.Tk):
         self.bind('<B1-Motion>',self.dragwin)
         my_menu = MyMenu(self, False)
         self.bind('<Button-3>',my_menu.popup)
-        etiqueta = Label(self, text='', api_url=c.BINANCE_API_URL, coin=c.BTCEUR)
+        etiqueta = Label(self, text='', api_url=c.BINANCE_API_URL,
+                         coin=c.BTCEUR)
 
     def dragwin(self,event):
         x = self.winfo_pointerx() - self._offsetx
         y = self.winfo_pointery() - self._offsety
-        self.geometry('+{x}+{y}'.format(x=x,y=y))
+        self.geometry('+{x}+{y}'.format(x=x, y=y))
 
     def clickwin(self,event):
         self._offsetx = event.x
         self._offsety = event.y
 
     def configure_window(self):
-        slave1 = Slave(self)
+        slave1 = SlaveWindow(self)
         slave1.mainloop()
 
     def minimize_window(self):
         self.state("withdrawn")
         image=Image.open(c.FAVICON)
-        icon_menu=pystray.Menu(pystray.MenuItem('Quit', self.quit_window),pystray.MenuItem('Show', self.show_window))
+        icon_menu=pystray.Menu(pystray.MenuItem('Quit', self.quit_window),
+                               pystray.MenuItem('Show', self.show_window))
         icon=pystray.Icon("name", image, c.TITLE, icon_menu)
         icon.run()
 
@@ -50,10 +55,9 @@ class Win(tk.Tk):
         icon.stop()
         self.state("normal")
 
-
-class Slave(tk.Toplevel):
+class SlaveWindow(tk.Toplevel):
     """
-    Fix only possible to open one configuration window
+    Slave Window that can be dragged by left-clicking and is overrideredirected
     """
     def __init__(self,master):
         tk.Toplevel.__init__(self,master)
@@ -92,9 +96,6 @@ class Label(tk.Label):
             self.symbol = "Connection"
 
     def update_label(self, master, api_url):
-        """
-        Look up if this method needs his own class
-        """
         t = threading.Thread(target=self.get_request, args=(api_url,))
         t.start()
         try:
@@ -132,5 +133,5 @@ class MyMenu(tk.Menu):
 
 
 if __name__ == '__main__':
-    master_win = Win()
+    master_win = MasterWindow()
     master_win.mainloop()
