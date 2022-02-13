@@ -7,6 +7,10 @@
 pip install -r requirements.txt
 ```
 
+- Use $python ExchangeAlertManager.py to run the program.
+
+- If want to launch ExchangeAlertManager.py on StartUp, modify the ExchangeAlertManager.bat with your path and copy it in shell:startup ("Windows + r" and type "shell:startup").
+
 ## About
 
 ExchangeAlertManager is a simple application for making automatic requests to several Exchange APIs. It provides a dragable window that prints the actual value of the desired cryptocoin.
