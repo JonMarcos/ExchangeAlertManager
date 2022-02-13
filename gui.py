@@ -13,13 +13,13 @@ class MasterWindow(tk.Tk):
     """
     def __init__(self,master=None):
         tk.Tk.__init__(self,master)
-        self.geometry("170x20+900+1019")
+        self.geometry("170x20"+c.INITIAL_POS)
         self.overrideredirect(True)
         self.attributes("-topmost", True)
         self.resizable(width=False, height=False)
         self.title(c.TITLE)
-        self.bind('<Button-1>',self.clickwin)
-        self.bind('<B1-Motion>',self.dragwin)
+        self.bind('<Button-1>',self.clickwin)   # Click for dragging Window
+        self.bind('<B1-Motion>',self.dragwin)   # Drag the Window
         my_menu = MyMenu(self, False)
         self.bind('<Button-3>',my_menu.popup)
         etiqueta = Label(self, text='', api_url=c.BINANCE_API_URL,
@@ -28,6 +28,8 @@ class MasterWindow(tk.Tk):
     def dragwin(self,event):
         x = self.winfo_pointerx() - self._offsetx
         y = self.winfo_pointery() - self._offsety
+        if y > 1018:
+            y = 1018    # Limits Window to go under taskbar
         self.geometry('+{x}+{y}'.format(x=x, y=y))
 
     def clickwin(self,event):

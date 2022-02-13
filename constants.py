@@ -17,3 +17,6 @@ YELLOW = "#FAC60E"
 
 #Images
 FAVICON = "C:/Users/Jon/github/ExchangeAlertManager/favicon.png"
+
+#Position
+INITIAL_POS = "+900+1018"
