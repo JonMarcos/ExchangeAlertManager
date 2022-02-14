@@ -9,7 +9,7 @@ pip install -r requirements.txt
 
 - Use $python ExchangeAlertManager.py to run the program.
 
-- If want to launch ExchangeAlertManager.py on StartUp, modify the ExchangeAlertManager.bat with your path and copy it in shell:startup ("Windows + r" and type "shell:startup").
+- If want to launch ExchangeAlertManager.py on StartUp, modify the ExchangeAlertManager.bat with your path and copy it in shell:startup ("Windows + r" and type "shell:startup"). You have also to replace the path FAVICON from constants.py.
 
 ## About
 
