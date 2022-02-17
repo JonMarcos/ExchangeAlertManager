@@ -1,2 +1,2 @@
 @echo off
-start "" pythonw "C:\Users\Jon\github\ExchangeAlertManager\ExchangeAlertManager.py"
+start "" "C:\Users\Jon\venv\ExchangeAlertManager\Scripts\pythonw" "C:\Users\Jon\github\ExchangeAlertManager\ExchangeAlertManager.py"
